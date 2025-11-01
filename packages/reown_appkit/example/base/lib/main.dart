@@ -64,9 +64,6 @@ class _MyHomePageState extends State<MyHomePage> {
       name: 'Reown\'s AppKit ${_flavor.replaceFirst('-', '')}',
       description: 'Reown\'s sample dApp with Flutter SDK',
       url: _universalLink(),
-      icons: [
-        'https://raw.githubusercontent.com/reown-com/reown_flutter/refs/heads/develop/assets/appkit-icon$_flavor.png',
-      ],
       redirect: _constructRedirect(linkModeEnabled),
     );
   }
