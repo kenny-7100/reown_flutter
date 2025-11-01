@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:reown_appkit/reown_appkit.dart';
 import 'package:reown_appkit_dapp/pages/connect_page.dart';
 import 'package:reown_appkit_dapp/utils/crypto/helpers.dart';
-import 'package:reown_appkit_dapp/utils/dart_defines.dart';
 import 'package:reown_appkit_dapp/utils/deep_link_handler.dart';
 
 Future<void> main() async {
@@ -83,7 +82,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _initializeService() async {
     _appKit = ReownAppKit(
-      core: ReownCore(projectId: DartDefines.projectId, logLevel: LogLevel.all),
+      core: ReownCore(
+          projectId: '986837d557c1c7a14641d330a1135226',
+          logLevel: LogLevel.all),
       metadata: _pairingMetadata(false),
     );
 
