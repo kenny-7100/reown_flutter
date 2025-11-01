@@ -4,13 +4,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:reown_appkit/reown_appkit.dart';
-// ignore: depend_on_referenced_packages
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
-
-import 'package:reown_appkit_dapp/models/page_data.dart';
 import 'package:reown_appkit_dapp/pages/connect_page.dart';
-import 'package:reown_appkit_dapp/utils/constants.dart';
 import 'package:reown_appkit_dapp/utils/crypto/helpers.dart';
 import 'package:reown_appkit_dapp/utils/dart_defines.dart';
 import 'package:reown_appkit_dapp/utils/deep_link_handler.dart';
@@ -81,9 +76,6 @@ class _MyHomePageState extends State<MyHomePage> {
   ReownAppKit? _appKit;
   ReownAppKitModal? _appKitModal;
 
-  List<PageData> _pageDatas = [];
-  int _selectedIndex = 0;
-  bool _showLogOverlay = false;
   final LogManager _logManager = LogManager();
 
   @override
@@ -125,34 +117,12 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  FeaturesConfig? _featuresConfig() {
-    return FeaturesConfig(
-      socials: [
-        AppKitSocialOption.Email,
-        AppKitSocialOption.X,
-        AppKitSocialOption.Google,
-        AppKitSocialOption.Apple,
-        AppKitSocialOption.Discord,
-        AppKitSocialOption.GitHub,
-        AppKitSocialOption.Facebook,
-        AppKitSocialOption.Twitch,
-        AppKitSocialOption.Telegram,
-      ],
-      showMainWallets: true,
-    );
-  }
-
   void _logListener(String event) => _logManager.addLog(event);
 
   Future<void> _initializeService() async {
-    final prefs = await SharedPreferences.getInstance();
-    final linkModeEnabled = false;
-    final analyticsEnabled = prefs.getBool('appkit_sample_analytics') ?? true;
-    final socialsEnabled = prefs.getBool('appkit_sample_socials') ?? true;
-
     _appKit = ReownAppKit(
       core: ReownCore(projectId: DartDefines.projectId, logLevel: LogLevel.all),
-      metadata: _pairingMetadata(linkModeEnabled),
+      metadata: _pairingMetadata(false),
     );
 
     _appKit!.core.relayClient.onRelayClientError.subscribe(_relayClientError);
@@ -163,28 +133,12 @@ class _MyHomePageState extends State<MyHomePage> {
     _appKitModal = ReownAppKitModal(
       context: context,
       appKit: _appKit,
-      logLevel: LogLevel.all,
-      enableAnalytics: analyticsEnabled,
-      siweConfig: _siweConfig(linkModeEnabled),
-      featuresConfig: socialsEnabled ? _featuresConfig() : null,
+      siweConfig: _siweConfig(false),
       optionalNamespaces: _namespacesBasedOnChains(),
       getBalanceFallback: () async {
         return 0.0;
       },
       disconnectOnDispose: true,
-      customWallets: [
-        ReownAppKitModalWalletInfo(
-          listing: AppKitModalWalletListing(
-            id: '00001',
-            name: 'Reown Web Sample',
-            homepage: 'https://react-wallet.walletconnect.com',
-            imageId:
-                'https://avatars.githubusercontent.com/u/179229932?s=200&v=4',
-            order: 1,
-            webappLink: 'https://react-wallet.walletconnect.com',
-          ),
-        ),
-      ],
     );
 
     _appKitModal!.appKit!.core.addLogListener(_logListener);
@@ -193,14 +147,6 @@ class _MyHomePageState extends State<MyHomePage> {
     _appKitModal!.onModalError.subscribe(_onModalError);
     _appKitModal!.onSessionEventEvent.subscribe(_onSessionEvent);
     _appKitModal!.onSessionUpdateEvent.subscribe(_onSessionUpdate);
-
-    _pageDatas = [
-      PageData(
-        page: ConnectPage(appKitModal: _appKitModal!),
-        title: StringConstants.connectPageTitle,
-        icon: Icons.home,
-      ),
-    ];
 
     await _appKitModal!.init();
     await _registerEventHandlers();
@@ -281,69 +227,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_pageDatas.isEmpty) {
-      return Center(child: CircularProgressIndicator());
-    }
-    final List<Widget> navRail = [];
-    if (MediaQuery.of(context).size.width >= Constants.smallScreen) {
-      navRail.add(_buildNavigationRail());
-    }
-    navRail.add(Expanded(child: _pageDatas[_selectedIndex].page));
-
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_pageDatas[_selectedIndex].title),
-        actions: [
-          const Text('Relay '),
-          CircleAvatar(
-            radius: 6.0,
-            backgroundColor: _appKit!.core.relayClient.isConnected
-                ? Colors.green
-                : Colors.red,
-          ),
-          const SizedBox(width: 16.0),
-        ],
-      ),
-      body: Stack(
-        children: [
-          Center(
-            child: Container(
-              constraints: BoxConstraints(
-                maxWidth: Constants.smallScreen.toDouble(),
-              ),
-              child: Row(children: navRail),
-            ),
-          ),
-          if (_showLogOverlay)
-            StreamBuilder<List<String>>(
-              stream: _logManager.logsStream,
-              initialData: _logManager.logs,
-              builder: (context, snapshot) {
-                return LogOverlay(
-                  logs: snapshot.data ?? [],
-                  onClear: () => _logManager.clearLogs(),
-                  onToggle: () => setState(() => _showLogOverlay = false),
-                );
-              },
-            ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNavigationRail() {
-    return NavigationRail(
-      selectedIndex: _selectedIndex,
-      onDestinationSelected: (index) => setState(() => _selectedIndex = index),
-      labelType: NavigationRailLabelType.selected,
-      destinations: _pageDatas
-          .map(
-            (e) => NavigationRailDestination(
-              icon: Icon(e.icon),
-              label: Text(e.title),
-            ),
-          )
-          .toList(),
+      body: ConnectPage(appKitModal: _appKitModal!),
     );
   }
 
