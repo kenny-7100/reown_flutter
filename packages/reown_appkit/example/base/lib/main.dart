@@ -190,9 +190,6 @@ class _MyHomePageState extends State<MyHomePage> {
     _appKitModal!.appKit!.core.addLogListener(_logListener);
 
     _appKitModal!.onModalConnect.subscribe(_onModalConnect);
-    _appKitModal!.onModalUpdate.subscribe(_onModalUpdate);
-    _appKitModal!.onModalNetworkChange.subscribe(_onModalNetworkChange);
-    _appKitModal!.onModalDisconnect.subscribe(_onModalDisconnect);
     _appKitModal!.onModalError.subscribe(_onModalError);
     _appKitModal!.onSessionEventEvent.subscribe(_onSessionEvent);
     _appKitModal!.onSessionUpdateEvent.subscribe(_onSessionUpdate);
@@ -274,9 +271,6 @@ class _MyHomePageState extends State<MyHomePage> {
     _appKit!.core.relayClient.onRelayClientMessage.unsubscribe(_onRelayMessage);
 
     _appKitModal!.onModalConnect.unsubscribe(_onModalConnect);
-    _appKitModal!.onModalUpdate.unsubscribe(_onModalUpdate);
-    _appKitModal!.onModalNetworkChange.unsubscribe(_onModalNetworkChange);
-    _appKitModal!.onModalDisconnect.unsubscribe(_onModalDisconnect);
     _appKitModal!.onModalError.unsubscribe(_onModalError);
     _appKitModal!.onSessionEventEvent.unsubscribe(_onSessionEvent);
     _appKitModal!.onSessionUpdateEvent.unsubscribe(_onSessionUpdate);
@@ -450,21 +444,6 @@ class _MyHomePageState extends State<MyHomePage> {
         duration: Duration(seconds: 2),
       ),
     );
-  }
-
-  void _onModalUpdate(ModalConnect? event) {
-    debugPrint('[ExampleApp] _onModalUpdate ${event?.session.toJson()}');
-    setState(() {});
-  }
-
-  void _onModalNetworkChange(ModalNetworkChange? event) {
-    debugPrint('[ExampleApp] _onModalNetworkChange ${event?.toString()}');
-    setState(() {});
-  }
-
-  void _onModalDisconnect(ModalDisconnect? event) {
-    debugPrint('[ExampleApp] _onModalDisconnect ${event?.toString()}');
-    setState(() {});
   }
 
   void _onModalError(ModalError? event) {
