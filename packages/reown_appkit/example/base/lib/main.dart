@@ -108,7 +108,6 @@ class _MyHomePageState extends State<MyHomePage> {
     _appKitModal = ReownAppKitModal(
       context: context,
       appKit: _appKit,
-      siweConfig: _siweConfig(false),
       optionalNamespaces: _namespacesBasedOnChains(),
       getBalanceFallback: () async {
         return 0.0;
@@ -239,61 +238,6 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     }
   }
-
-  SIWEConfig _siweConfig(bool enabled) => SIWEConfig(
-        getNonce: () async {
-          return SIWEUtils.generateNonce();
-        },
-        getMessageParams: () async {
-          debugPrint('[SIWEConfig] getMessageParams()');
-          final url = _appKitModal!.appKit!.metadata.url;
-          final uri = Uri.parse(url);
-          return SIWEMessageArgs(
-            domain: uri.authority,
-            uri: 'https://${uri.authority}/login',
-            statement: 'Welcome to AppKit $packageVersion for Flutter.',
-            methods: MethodsConstants.allMethods,
-          );
-        },
-        createMessage: (SIWECreateMessageArgs args) {
-          debugPrint('[SIWEConfig] createMessage()');
-          return SIWEUtils.formatMessage(args);
-        },
-        verifyMessage: (SIWEVerifyMessageArgs args) async {
-          debugPrint('[SIWEConfig] verifyMessage()');
-          final chainId = SIWEUtils.getChainIdFromMessage(args.message);
-          final address = SIWEUtils.getAddressFromMessage(args.message);
-          final cacaoSignature = args.cacao != null
-              ? args.cacao!.s
-              : CacaoSignature(t: CacaoSignature.EIP191, s: args.signature);
-          return await SIWEUtils.verifySignature(
-            address,
-            args.message,
-            cacaoSignature,
-            chainId,
-            DartDefines.projectId,
-          );
-        },
-        getSession: () async {
-          final chainId = _appKitModal!.selectedChain!.chainId;
-          final namespace = NamespaceUtils.getNamespaceFromChain(chainId);
-          final address = _appKitModal!.session!.getAddress(namespace)!;
-          return SIWESession(address: address, chains: [chainId]);
-        },
-        onSignIn: (SIWESession session) {
-          debugPrint('[SIWEConfig] onSignIn()');
-        },
-        signOut: () async {
-          return true;
-        },
-        onSignOut: () {
-          debugPrint('[SIWEConfig] onSignOut()');
-        },
-        enabled: enabled,
-        signOutOnDisconnect: true,
-        signOutOnAccountChange: false,
-        signOutOnNetworkChange: false,
-      );
 
   void _onModalConnect(ModalConnect? event) async {
     debugPrint('[ExampleApp] _onModalConnect ${event?.session.toJson()}');
