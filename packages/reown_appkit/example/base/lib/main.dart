@@ -1,6 +1,3 @@
-import 'dart:async';
-import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:reown_appkit/reown_appkit.dart';
@@ -10,20 +7,15 @@ import 'package:reown_appkit_dapp/utils/deep_link_handler.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   DeepLinkHandler.initListener();
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       home: MyHomePage(),
     );
   }
@@ -82,29 +74,17 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _initializeService() async {
     _appKit = ReownAppKit(
       core: ReownCore(
-          projectId: '986837d557c1c7a14641d330a1135226',
-          logLevel: LogLevel.all),
+        projectId: '986837d557c1c7a14641d330a1135226',
+        logLevel: LogLevel.nothing,
+      ),
       metadata: _pairingMetadata(false),
     );
-
-    _appKit!.core.relayClient.onRelayClientError.subscribe(_relayClientError);
-    _appKit!.core.relayClient.onRelayClientConnect.subscribe(_setState);
-    _appKit!.core.relayClient.onRelayClientDisconnect.subscribe(_setState);
-    _appKit!.core.relayClient.onRelayClientMessage.subscribe(_onRelayMessage);
 
     _appKitModal = ReownAppKitModal(
       context: context,
       appKit: _appKit,
-      getBalanceFallback: () async {
-        return 0.0;
-      },
       disconnectOnDispose: true,
     );
-
-    _appKitModal!.onModalConnect.subscribe(_onModalConnect);
-    _appKitModal!.onModalError.subscribe(_onModalError);
-    _appKitModal!.onSessionEventEvent.subscribe(_onSessionEvent);
-    _appKitModal!.onSessionUpdateEvent.subscribe(_onSessionUpdate);
 
     await _appKitModal!.init();
 
@@ -112,81 +92,10 @@ class _MyHomePageState extends State<MyHomePage> {
     DeepLinkHandler.checkInitialLink();
   }
 
-  void _relayClientError(ErrorEvent? event) {
-    debugPrint('[SampleDapp] _relayClientError ${event?.error}');
-    _setState('');
-  }
-
-  void _setState(_) => setState(() {});
-
-  @override
-  void dispose() {
-    _appKit!.core.relayClient.onRelayClientError.unsubscribe(_relayClientError);
-    _appKit!.core.relayClient.onRelayClientConnect.unsubscribe(_setState);
-    _appKit!.core.relayClient.onRelayClientDisconnect.unsubscribe(_setState);
-    _appKit!.core.relayClient.onRelayClientMessage.unsubscribe(_onRelayMessage);
-
-    _appKitModal!.onModalConnect.unsubscribe(_onModalConnect);
-    _appKitModal!.onModalError.unsubscribe(_onModalError);
-    _appKitModal!.onSessionEventEvent.unsubscribe(_onSessionEvent);
-    _appKitModal!.onSessionUpdateEvent.unsubscribe(_onSessionUpdate);
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: ConnectPage(appKitModal: _appKitModal!),
-    );
-  }
-
-  void _onSessionEvent(SessionEvent? args) {
-    debugPrint('[SampleDapp] _onSessionEvent $args');
-  }
-
-  void _onSessionUpdate(SessionUpdate? args) {
-    debugPrint('[SampleDapp] _onSessionUpdate $args');
-  }
-
-  void _onRelayMessage(MessageEvent? args) async {
-    if (args != null) {
-      try {
-        final payloadString = await _appKit!.core.crypto.decode(
-          args.topic,
-          args.message,
-        );
-        final data = jsonDecode(payloadString ?? '{}') as Map<String, dynamic>;
-        debugPrint('[SampleDapp] _onRelayMessage data $data');
-      } catch (e) {
-        debugPrint('[SampleDapp] _onRelayMessage error $e');
-      }
-    }
-  }
-
-  void _onModalConnect(ModalConnect? event) async {
-    debugPrint('[ExampleApp] _onModalConnect ${event?.session.toJson()}');
-    setState(() {});
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('AppKit is connected'),
-        duration: Duration(seconds: 2),
-      ),
-    );
-  }
-
-  void _onModalError(ModalError? event) {
-    debugPrint('[ExampleApp] _onModalError ${event?.toString()}');
-    if ((event?.message ?? '').contains('Coinbase Wallet Error')) {
-      _appKitModal!.disconnect();
-    }
-    setState(() {});
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          event?.message ?? event?.description ?? 'An error occurred',
-        ),
-        duration: Duration(seconds: 2),
-      ),
     );
   }
 }

@@ -11,10 +11,7 @@ class ConnectPage extends StatelessWidget {
     return Column(
       children: [
         AppKitModalConnectButton(appKit: appKitModal),
-        Visibility(
-          visible: appKitModal.isConnected,
-          child: AppKitModalAccountButton(appKitModal: appKitModal),
-        ),
+        AppKitModalAccountButton(appKitModal: appKitModal),
       ],
     );
   }
