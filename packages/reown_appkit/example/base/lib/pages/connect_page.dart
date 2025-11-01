@@ -11,34 +11,16 @@ class ConnectPage extends StatefulWidget {
 }
 
 class ConnectPageState extends State<ConnectPage> {
-  Future<void> _refreshData() async {
-    try {
-      await widget.appKitModal.reconnectRelay();
-      final topic = widget.appKitModal.session!.topic ?? '';
-      if (topic.isNotEmpty) {
-        await widget.appKitModal.loadAccountData();
-        widget.appKitModal.appKit!.ping(topic: topic);
-      }
-    } catch (e) {
-      debugPrint(e.toString());
-    }
-    setState(() {});
-    return;
-  }
-
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
-      onRefresh: _refreshData,
-      child: Column(
-        children: [
-          AppKitModalConnectButton(appKit: widget.appKitModal),
-          Visibility(
-            visible: widget.appKitModal.isConnected,
-            child: AppKitModalAccountButton(appKitModal: widget.appKitModal),
-          ),
-        ],
-      ),
+    return Column(
+      children: [
+        AppKitModalConnectButton(appKit: widget.appKitModal),
+        Visibility(
+          visible: widget.appKitModal.isConnected,
+          child: AppKitModalAccountButton(appKitModal: widget.appKitModal),
+        ),
+      ],
     );
   }
 }
