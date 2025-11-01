@@ -61,8 +61,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   PairingMetadata _pairingMetadata(bool linkModeEnabled) {
     return PairingMetadata(
-      name: 'Reown\'s AppKit ${_flavor.replaceFirst('-', '')}',
-      description: 'Reown\'s sample dApp with Flutter SDK',
+      name: 'name',
+      description: 'description',
       url: _universalLink(),
       redirect: _constructRedirect(linkModeEnabled),
     );
