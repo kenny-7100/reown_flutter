@@ -8,8 +8,6 @@ import 'package:reown_appkit_dapp/pages/connect_page.dart';
 import 'package:reown_appkit_dapp/utils/crypto/helpers.dart';
 import 'package:reown_appkit_dapp/utils/dart_defines.dart';
 import 'package:reown_appkit_dapp/utils/deep_link_handler.dart';
-import 'package:reown_appkit_dapp/utils/string_constants.dart';
-import 'package:reown_appkit_dapp/widgets/event_widget.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,7 +26,6 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: StringConstants.appTitle,
       home: MyHomePage(),
     );
   }
@@ -192,16 +189,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _onSessionEvent(SessionEvent? args) {
     debugPrint('[SampleDapp] _onSessionEvent $args');
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return EventWidget(
-          title: StringConstants.receivedEvent,
-          content:
-              'Topic: ${args!.topic}\nEvent Name: ${args.name}\nEvent Data: ${args.data}',
-        );
-      },
-    );
   }
 
   void _onSessionUpdate(SessionUpdate? args) {
