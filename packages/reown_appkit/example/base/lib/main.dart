@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:reown_appkit/reown_appkit.dart';
 import 'package:reown_appkit_dapp/pages/connect_page.dart';
@@ -38,33 +37,17 @@ class _MyHomePageState extends State<MyHomePage> {
     _initializeService();
   }
 
-  String get _flavor {
-    String flavor = '-${const String.fromEnvironment('FLUTTER_APP_FLAVOR')}';
-    return flavor.replaceAll('-production', '');
-  }
-
-  String _universalLink() {
-    Uri link = Uri.parse('https://appkit-lab.reown.com/flutter_appkit');
-    if (_flavor.isNotEmpty || kDebugMode) {
-      return link.replace(path: '${link.path}_internal').toString();
-    }
-    return link.toString();
-  }
-
-  Redirect _constructRedirect(bool linkModeEnabled) {
-    return Redirect(
-      native: 'wcflutterdapp$_flavor://',
-      universal: _universalLink(),
-      linkMode: linkModeEnabled,
-    );
-  }
-
-  PairingMetadata _pairingMetadata(bool linkModeEnabled) {
+  PairingMetadata get _pairingMetadata {
+    const universalLink = 'https://appkit-lab.reown.com/flutter_appkit';
     return PairingMetadata(
       name: 'name',
       description: 'description',
-      url: _universalLink(),
-      redirect: _constructRedirect(linkModeEnabled),
+      url: universalLink,
+      redirect: Redirect(
+        native: 'wcflutterdapp://',
+        universal: universalLink,
+        linkMode: false,
+      ),
     );
   }
 
@@ -74,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
         projectId: '986837d557c1c7a14641d330a1135226',
         logLevel: LogLevel.nothing,
       ),
-      metadata: _pairingMetadata(false),
+      metadata: _pairingMetadata,
     );
 
     _appKitModal = ReownAppKitModal(
