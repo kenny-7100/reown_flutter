@@ -59,105 +59,19 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
-  bool _isDarkMode = false;
-  bool _isCustomTheme = false;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        final platformDispatcher = View.of(context).platformDispatcher;
-        final platformBrightness = platformDispatcher.platformBrightness;
-        _isDarkMode = platformBrightness == Brightness.dark;
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  void didChangePlatformBrightness() {
-    if (mounted) {
-      setState(() {
-        final platformDispatcher = View.of(context).platformDispatcher;
-        final platformBrightness = platformDispatcher.platformBrightness;
-        _isDarkMode = platformBrightness == Brightness.dark;
-      });
-    }
-    super.didChangePlatformBrightness();
-  }
-
+class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return ReownAppKitModalTheme(
-      isDarkMode: _isDarkMode,
-      themeData: _isCustomTheme
-          ? ReownAppKitModalThemeData(
-              darkColors: ReownAppKitModalColors.darkMode.copyWith(
-                accent100: const Color.fromARGB(255, 55, 186, 149),
-                accent090: const Color.fromARGB(255, 55, 186, 149),
-                accent080: const Color.fromARGB(255, 55, 186, 149),
-                grayGlass100: const Color.fromARGB(255, 55, 186, 149),
-                background125: const Color.fromARGB(255, 0, 0, 0),
-                foreground100: const Color.fromARGB(255, 55, 186, 149),
-                foreground125: const Color.fromARGB(255, 255, 255, 255),
-                foreground200: const Color.fromARGB(255, 255, 255, 255),
-                foreground300: const Color.fromARGB(255, 255, 255, 255),
-              ),
-              lightColors: ReownAppKitModalColors.darkMode.copyWith(
-                accent100: const Color.fromARGB(255, 55, 186, 149),
-                accent090: const Color.fromARGB(255, 55, 186, 149),
-                accent080: const Color.fromARGB(255, 55, 186, 149),
-                grayGlass100: const Color.fromARGB(255, 55, 186, 149),
-                background125: const Color.fromARGB(255, 255, 255, 255),
-                foreground100: const Color.fromARGB(255, 55, 186, 149),
-                foreground125: const Color.fromARGB(255, 0, 0, 0),
-                foreground200: const Color.fromARGB(255, 0, 0, 0),
-                foreground300: const Color.fromARGB(255, 0, 0, 0),
-              ),
-              radiuses: ReownAppKitModalRadiuses.square,
-            )
-          : null,
-      child: MaterialApp(
-        navigatorObservers: [SentryNavigatorObserver()],
-        title: StringConstants.appTitle,
-        theme: ThemeData(
-          colorScheme: _isDarkMode
-              ? ColorScheme.dark(
-                  primary: ReownAppKitModalThemeData().darkColors.accent100,
-                )
-              : ColorScheme.light(
-                  primary: ReownAppKitModalThemeData().lightColors.accent100,
-                ),
-        ),
-        home: MyHomePage(
-          isCustomTheme: _isCustomTheme,
-          toggleTheme: () {
-            setState(() {
-              _isCustomTheme = !_isCustomTheme;
-            });
-          },
-        ),
-      ),
+    return MaterialApp(
+      navigatorObservers: [SentryNavigatorObserver()],
+      title: StringConstants.appTitle,
+      home: MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({
-    super.key,
-    required this.isCustomTheme,
-    required this.toggleTheme,
-  });
-  final VoidCallback toggleTheme;
-  final bool isCustomTheme;
+  const MyHomePage({super.key});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
