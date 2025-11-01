@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:reown_appkit/reown_appkit.dart';
 import 'package:reown_appkit_dapp/utils/constants.dart';
 import 'package:reown_appkit_dapp/utils/crypto/helpers.dart';
-import 'package:reown_appkit_dapp/widgets/method_dialog.dart';
-import 'package:toastification/toastification.dart';
 
 class ConnectPage extends StatefulWidget {
   const ConnectPage({super.key, required this.appKitModal});
@@ -92,7 +90,6 @@ class ConnectPageState extends State<ConnectPage> {
             ),
             children: <Widget>[
               const SizedBox(height: StyleConstants.linear16),
-              _TitleSection(appKitModal: widget.appKitModal),
               const SizedBox(height: StyleConstants.linear8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -106,16 +103,6 @@ class ConnectPageState extends State<ConnectPage> {
                   AppKitModalConnectButton(
                     appKit: widget.appKitModal,
                     size: BaseButtonSize.small,
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  PrimaryButton(
-                    buttonSize: BaseButtonSize.regular,
-                    onTap: _openDepositScreen,
-                    title: 'Deposit with Exchange',
                   ),
                 ],
               ),
@@ -146,8 +133,6 @@ class ConnectPageState extends State<ConnectPage> {
                       'Connected with ${widget.appKitModal.session?.connectedWalletName ?? 'Unknown wallet'}',
                     ),
                     const SizedBox.square(dimension: 8.0),
-                    _RequestButtons(appKitModal: widget.appKitModal),
-                    const SizedBox.square(dimension: 8.0),
                     _SmartAccountButtons(appKitModal: widget.appKitModal),
                     const SizedBox.square(dimension: 8.0),
                     Text(
@@ -164,10 +149,6 @@ class ConnectPageState extends State<ConnectPage> {
         ],
       ),
     );
-  }
-
-  void _openDepositScreen() {
-    widget.appKitModal.openModalView(ReownAppKitModalDepositScreen());
   }
 
   void _onSessionConnect(SessionConnect? event) async {
@@ -202,69 +183,6 @@ class ConnectPageState extends State<ConnectPage> {
   }
 }
 
-class _RequestButtons extends StatefulWidget {
-  final ReownAppKitModal appKitModal;
-  const _RequestButtons({required this.appKitModal});
-
-  @override
-  State<_RequestButtons> createState() => __RequestButtonsState();
-}
-
-class __RequestButtonsState extends State<_RequestButtons> {
-  @override
-  Widget build(BuildContext context) {
-    final topic = widget.appKitModal.session!.topic ?? '';
-    final chainId = widget.appKitModal.selectedChain?.chainId ?? '';
-    if (chainId.isEmpty) {
-      return SizedBox.shrink();
-    }
-    final namespace = NamespaceUtils.getNamespaceFromChain(chainId);
-    final approvedMethods = widget.appKitModal.getApprovedMethods(
-      namespace: namespace,
-    );
-    final address = widget.appKitModal.session!.getAddress(namespace)!;
-    final chainInfo = ReownAppKitModalNetworks.getNetworkInfo(
-      namespace,
-      chainId,
-    );
-    final implemented = getChainMethods(namespace);
-    return Wrap(
-      alignment: WrapAlignment.center,
-      spacing: 8.0,
-      children: (approvedMethods ?? [])
-          .toSet()
-          .intersection(implemented.toSet())
-          .map(
-            (method) => PrimaryButton(
-              title: method,
-              borderRadius: BorderRadius.all(Radius.circular(30.0)),
-              buttonSize: BaseButtonSize.regular,
-              onTap: () async {
-                final params = await getParams(method, address, chainInfo!);
-                if (params?.params != null) {
-                  final future = widget.appKitModal.request(
-                    topic: topic,
-                    chainId: chainId,
-                    request: params!,
-                  );
-                  await MethodDialog.show(context, method, future);
-                } else {
-                  toastification.show(
-                    type: ToastificationType.error,
-                    title: const Text('Method not implemented'),
-                    context: context,
-                    autoCloseDuration: Duration(seconds: 2),
-                    alignment: Alignment.bottomCenter,
-                  );
-                }
-              },
-            ),
-          )
-          .toList(),
-    );
-  }
-}
-
 class _SmartAccountButtons extends StatefulWidget {
   final ReownAppKitModal appKitModal;
   const _SmartAccountButtons({required this.appKitModal});
@@ -290,34 +208,6 @@ class __SmartAccountButtonsState extends State<_SmartAccountButtons> {
       builder: (context, snapshot) {
         return snapshot.data ?? SizedBox.shrink();
       },
-    );
-  }
-}
-
-class _TitleSection extends StatelessWidget {
-  final ReownAppKitModal appKitModal;
-  const _TitleSection({required this.appKitModal});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          appKitModal.appKit!.metadata.name,
-          style: StyleConstants.subtitleText.copyWith(
-            color: ReownAppKitModalTheme.colorsOf(context).foreground100,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        Text(
-          appKitModal.appKit!.metadata.description,
-          style: StyleConstants.paragraph.copyWith(
-            color: ReownAppKitModalTheme.colorsOf(context).foreground100,
-            fontWeight: FontWeight.normal,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ],
     );
   }
 }
