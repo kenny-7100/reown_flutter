@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:reown_appkit/reown_appkit.dart';
 import 'package:reown_appkit_dapp/pages/connect_page.dart';
-import 'package:reown_appkit_dapp/utils/crypto/helpers.dart';
+import 'package:reown_appkit_dapp/utils/crypto/solana.dart';
 import 'package:reown_appkit_dapp/utils/deep_link_handler.dart';
 
 Future<void> main() async {
@@ -116,8 +116,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     final allChains = ReownAppKitModalNetworks.getAllSupportedNetworks();
     for (final chain in allChains) {
-      final namespace = NamespaceUtils.getNamespaceFromChain(chain.chainId);
-      for (final event in getChainEvents(namespace)) {
+      for (final event in Solana.events) {
         _appKit!.registerEventHandler(chainId: chain.chainId, event: event);
       }
     }
@@ -134,8 +133,8 @@ class _MyHomePageState extends State<MyHomePage> {
       if (chains.isNotEmpty) {
         namespaces[ns] = RequiredNamespace(
           chains: chains.map((c) => c.chainId).toList(),
-          methods: getChainMethods(ns),
-          events: getChainEvents(ns),
+          methods: Solana.methods.values.toList(),
+          events: Solana.events,
         );
       }
     }
@@ -153,8 +152,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     final allChains = ReownAppKitModalNetworks.getAllSupportedNetworks();
     for (final chain in allChains) {
-      final namespace = NamespaceUtils.getNamespaceFromChain(chain.chainId);
-      for (final event in getChainEvents(namespace)) {
+      for (final event in Solana.events) {
         _appKit!.registerEventHandler(chainId: chain.chainId, event: event);
       }
     }
