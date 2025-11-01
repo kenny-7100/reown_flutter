@@ -3,32 +3,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:reown_appkit/reown_appkit.dart';
-import 'package:reown_appkit_dapp/utils/crypto/cosmos.dart';
-import 'package:reown_appkit_dapp/utils/crypto/near.dart';
-import 'package:reown_appkit_dapp/utils/crypto/eip155.dart';
-import 'package:reown_appkit_dapp/utils/crypto/polkadot.dart';
 import 'package:reown_appkit_dapp/utils/crypto/solana.dart';
-import 'package:reown_appkit_dapp/utils/crypto/tron.dart';
 import 'package:reown_appkit_dapp/utils/smart_contracts.dart';
 import 'package:reown_appkit_dapp/widgets/method_dialog.dart';
 
 List<String> getChainMethods(String namespace) {
   switch (namespace) {
-    case 'eip155':
-      return EIP155.methods.values.toList();
     case 'solana':
       return Solana.methods.values.toList();
-    case 'polkadot':
-      return Polkadot.methods.values.toList();
-    case 'tron':
-      return Tron.methods.values.toList();
-    case 'mvx':
-      // TODO move to mvx.dart
-      return ['mvx_signMessage', 'mvx_signTransaction'];
-    case 'near':
-      return Near.methods.values.toList();
-    case 'cosmos':
-      return Cosmos.methods.values.toList();
     default:
       return [];
   }
@@ -36,20 +18,8 @@ List<String> getChainMethods(String namespace) {
 
 List<String> getChainEvents(String namespace) {
   switch (namespace) {
-    case 'eip155':
-      return EIP155.events;
     case 'solana':
       return Solana.events;
-    case 'polkadot':
-      return Polkadot.events;
-    case 'tron':
-      return Tron.events;
-    case 'mvx':
-      return [];
-    case 'near':
-      return Near.events;
-    case 'cosmos':
-      return Cosmos.events.values.toList();
     default:
       return [];
   }
@@ -62,42 +32,6 @@ Future<SessionRequestParams?> getParams(
   String? callback,
 }) async {
   switch (method) {
-    case 'personal_sign':
-      final encodedMessage = EIP155.personalSignMessage(chainData.name);
-      return SessionRequestParams(
-        method: method,
-        params: [encodedMessage, address],
-      );
-    case 'eth_sign':
-      return SessionRequestParams(
-        method: method,
-        params: [address, 'Welcome to Flutter AppKit on ${chainData.name}'],
-      );
-    case 'eth_signTypedData':
-      return SessionRequestParams(
-        method: method,
-        params: [address, EIP155.typedData],
-      );
-    case 'eth_signTypedData_v3':
-    case 'eth_signTypedData_v4':
-      return SessionRequestParams(
-        method: method,
-        params: [address, EIP155.typeDataV4(int.parse(chainData.chainId))],
-      );
-    case 'eth_signTransaction':
-    case 'eth_sendTransaction':
-      return SessionRequestParams(
-        method: method,
-        params: [
-          Transaction(
-            from: EthereumAddress.fromHex(address),
-            // to: should be the recipient address
-            to: EthereumAddress.fromHex(address),
-            value: EtherAmount.fromInt(EtherUnit.finney, 12), // == 0.012
-            data: utf8.encode('0x'), // to make it work with some wallets
-          ).toJson(),
-        ],
-      );
     case 'solana_signMessage':
       final message = Solana.personalSignMessage();
       return SessionRequestParams(
@@ -138,81 +72,6 @@ Future<SessionRequestParams?> getParams(
         params: {
           'transactions': [encodedV0Trx_1, encodedV0Trx_2],
         },
-      );
-    case 'tron_signMessage':
-      return SessionRequestParams(
-        method: method,
-        params: {
-          'address': address,
-          'message': 'Welcome to Flutter AppKit on Tron',
-        },
-      );
-    case 'tron_signTransaction':
-      final transaction = await Tron.triggerSmartContract(
-        chainData: chainData,
-        walletAdress: address,
-      );
-      return SessionRequestParams(
-        method: method,
-        params: {'address': address, 'transaction': transaction},
-      );
-    case 'polkadot_signMessage':
-      return SessionRequestParams(
-        method: method,
-        params: {
-          'address': address,
-          'message': 'Welcome to Flutter AppKit on Polkadot',
-        },
-      );
-    // case 'polkadot_signTransaction':
-    //   //
-    //   final transactionPayload = await Polkadot.transferKeepAlivePayload(
-    //     address, // sender
-    //     address, // destination
-    //     chainData,
-    //   );
-    //   return SessionRequestParams(
-    //     method: method,
-    //     params: {
-    //       'address': address,
-    //       'transactionPayload': transactionPayload,
-    //     },
-    //   );
-    case 'near_signMessage':
-      return SessionRequestParams(
-        method: method,
-        params: Near.demoMessageParams(address),
-      );
-    case 'near_signTransaction':
-      final jsonTransaction = jsonEncode(Near.demoFromReactDapp(address));
-      final base64Transaction = base64Encode(utf8.encode(jsonTransaction));
-      return SessionRequestParams(
-        method: method,
-        params: {'transaction': base64Transaction},
-      );
-    case 'near_signTransactions':
-      final jsonTransaction = jsonEncode(Near.demoFromReactDapp(address));
-      final base64Transaction = base64Encode(utf8.encode(jsonTransaction));
-      return SessionRequestParams(
-        method: method,
-        params: {
-          'transactions': [base64Transaction],
-        },
-      );
-    case 'cosmos_getAccounts':
-      return SessionRequestParams(
-        method: method,
-        params: {}, // params no needed for this method
-      );
-    case 'cosmos_signDirect':
-      return SessionRequestParams(
-        method: method,
-        params: Cosmos.signDirect(address, chainData.chainId),
-      );
-    case 'cosmos_signAmino':
-      return SessionRequestParams(
-        method: method,
-        params: Cosmos.signAmino(address, chainData.chainId),
       );
     default:
       return SessionRequestParams(method: method, params: null);
