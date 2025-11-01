@@ -1,18 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:reown_appkit/reown_appkit.dart';
-import 'package:reown_appkit_dapp/pages/settings_page.dart';
 // ignore: depend_on_referenced_packages
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'package:reown_appkit_dapp/models/page_data.dart';
 import 'package:reown_appkit_dapp/pages/connect_page.dart';
-import 'package:reown_appkit_dapp/pages/pairings_page.dart';
 import 'package:reown_appkit_dapp/utils/constants.dart';
 import 'package:reown_appkit_dapp/utils/crypto/helpers.dart';
 import 'package:reown_appkit_dapp/utils/dart_defines.dart';
@@ -280,14 +277,6 @@ class _MyHomePageState extends State<MyHomePage> {
     _appKit!.core.relayClient.onRelayClientDisconnect.subscribe(_setState);
     _appKit!.core.relayClient.onRelayClientMessage.subscribe(_onRelayMessage);
 
-    // See https://docs.reown.com/appkit/flutter/core/custom-chains
-    // final extraChains = ReownAppKitModalNetworks.extra['eip155']!;
-    // ReownAppKitModalNetworks.addSupportedNetworks('eip155', extraChains);
-    // ReownAppKitModalNetworks.removeSupportedNetworks('solana');
-    // ReownAppKitModalNetworks.removeTestNetworks();
-
-    _addOrRemoveNetworks(linkModeEnabled);
-
     _appKitModal = ReownAppKitModal(
       context: context,
       appKit: _appKit,
@@ -337,52 +326,6 @@ class _MyHomePageState extends State<MyHomePage> {
         title: StringConstants.connectPageTitle,
         icon: Icons.home,
       ),
-      PageData(
-        page: PairingsPage(appKitModal: _appKitModal!),
-        title: StringConstants.pairingsPageTitle,
-        icon: Icons.vertical_align_center_rounded,
-      ),
-      PageData(
-        page: SettingsPage(
-          appKitModal: _appKitModal!,
-          analytics: analyticsEnabled,
-          linkMode: linkModeEnabled,
-          socials: socialsEnabled,
-          toggleLogs: () => setState(() => _showLogOverlay = !_showLogOverlay),
-          toggleTheme: () => widget.toggleTheme.call(),
-          reinitialize: (String storageKey, bool value) async {
-            final result = await showDialog<bool>(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  content: Text('App will be closed to apply changes'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(false),
-                      child: Text('Cancel'),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(true),
-                      child: Text('Ok'),
-                    ),
-                  ],
-                );
-              },
-            );
-            if (result == true) {
-              await prefs.setBool(storageKey, value);
-              if (storageKey == 'appkit_sample_linkmode' && !value) {
-                await _appKitModal!.appKit!.core.storage.deleteAll();
-              }
-              if (!kDebugMode) {
-                exit(0);
-              }
-            }
-          },
-        ),
-        title: StringConstants.settingsPageTitle,
-        icon: Icons.settings,
-      ),
     ];
 
     await _appKitModal!.init();
@@ -399,97 +342,6 @@ class _MyHomePageState extends State<MyHomePage> {
       for (final event in getChainEvents(namespace)) {
         _appKit!.registerEventHandler(chainId: chain.chainId, event: event);
       }
-    }
-  }
-
-  // Adds or remove supported networks based on linkMode
-  void _addOrRemoveNetworks(bool linkMode) {
-    if (linkMode) {
-      // When linkMode is true, the application operates in "Link Mode",
-      // which is designed to support only EVM-compatible networks.
-      // As a result, non-EVM networks like Solana should be removed
-      ReownAppKitModalNetworks.removeSupportedNetworks('solana');
-    } else {
-      // When linkMode is false, the application supports a broader range of networks
-      ReownAppKitModalNetworks.addSupportedNetworks('polkadot', [
-        ReownAppKitModalNetworkInfo(
-          name: 'Polkadot',
-          chainId: '91b171bb158e2d3848fa23a9f1c25182',
-          chainIcon:
-              'https://pbs.twimg.com/profile_images/1944665239502323712/0FMaAZ31_400x400.jpg',
-          currency: 'DOT',
-          rpcUrl: 'wss://rpc.polkadot.io',
-          explorerUrl: 'https://polkadot.subscan.io',
-        ),
-        ReownAppKitModalNetworkInfo(
-          name: 'Westend',
-          chainId: 'e143f23803ac50e8f6f8e62695d1ce9e',
-          currency: 'WND',
-          rpcUrl: 'wss://westend-asset-hub-rpc.polkadot.io',
-          explorerUrl: 'https://westend.subscan.io',
-          isTestNetwork: true,
-        ),
-      ]);
-      ReownAppKitModalNetworks.addSupportedNetworks('tron', [
-        ReownAppKitModalNetworkInfo(
-          name: 'Tron',
-          chainId: '0x2b6653dc',
-          chainIcon:
-              'https://pbs.twimg.com/profile_images/1970541264568520704/J6wYDxYk_400x400.jpg',
-          currency: 'TRX',
-          rpcUrl: 'https://api.trongrid.io',
-          explorerUrl: 'https://tronscan.org',
-        ),
-        ReownAppKitModalNetworkInfo(
-          name: 'Tron testnet',
-          chainId: '0xcd8690dc',
-          currency: 'TRX',
-          rpcUrl: 'https://nile.trongrid.io',
-          explorerUrl: 'https://test.tronscan.org',
-          isTestNetwork: true,
-        ),
-      ]);
-      ReownAppKitModalNetworks.addSupportedNetworks('mvx', [
-        ReownAppKitModalNetworkInfo(
-          name: 'MultiversX',
-          chainId: '1',
-          currency: 'EGLD',
-          rpcUrl: 'https://api.multiversx.com',
-          explorerUrl: 'https://explorer.multiversx.com',
-          chainIcon:
-              'https://pbs.twimg.com/profile_images/1953134940301774848/UbIBbfXn_400x400.jpg',
-        ),
-      ]);
-      ReownAppKitModalNetworks.addSupportedNetworks('near', [
-        ReownAppKitModalNetworkInfo(
-          name: 'Near Mainnet',
-          chainId: 'mainnet',
-          currency: 'NEAR',
-          rpcUrl: 'https://rpc.mainnet.near.org',
-          explorerUrl: 'https://nearblocks.io',
-          chainIcon:
-              'https://pbs.twimg.com/profile_images/1970880320103985152/SAMA6Vh0_400x400.jpg',
-        ),
-        ReownAppKitModalNetworkInfo(
-          name: 'Near Testnet',
-          chainId: 'testnet',
-          currency: 'NEAR',
-          rpcUrl: 'https://rpc.testnet.near.org',
-          explorerUrl: 'https://testnet.nearblocks.io',
-          isTestNetwork: true,
-        ),
-      ]);
-      ReownAppKitModalNetworks.addSupportedNetworks('cosmos', [
-        ReownAppKitModalNetworkInfo(
-          name: 'Cosmos hub',
-          chainId: 'cosmoshub-4',
-          chainIcon:
-              'https://pbs.twimg.com/profile_images/1910273399282159616/OLSiIjEx_400x400.png',
-          currency: 'ATOM',
-          rpcUrl: 'https://rpc.cosmos.network',
-          explorerUrl: 'https://www.mintscan.io/cosmos/',
-        ),
-      ]);
     }
   }
 
@@ -611,32 +463,6 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
         ],
       ),
-      bottomNavigationBar:
-          MediaQuery.of(context).size.width < Constants.smallScreen
-              ? _buildBottomNavBar()
-              : null,
-    );
-  }
-
-  Widget _buildBottomNavBar() {
-    return BottomNavigationBar(
-      currentIndex: _selectedIndex,
-      unselectedItemColor: Colors.grey,
-      selectedItemColor: Color(0xFF667DFF),
-      showUnselectedLabels: true,
-      type: BottomNavigationBarType.fixed,
-      // called when one tab is selected
-      onTap: (index) => setState(() => _selectedIndex = index),
-      // bottom tab items
-      items: _pageDatas.map((e) {
-        return BottomNavigationBarItem(
-          icon: Semantics(
-            label: '${e.title} page button',
-            child: Icon(e.icon, semanticLabel: '${e.title} page icon'),
-          ),
-          label: e.title,
-        );
-      }).toList(),
     );
   }
 
