@@ -10,17 +10,11 @@ import 'package:reown_appkit_dapp/utils/dart_defines.dart';
 import 'package:reown_appkit_dapp/utils/deep_link_handler.dart';
 import 'package:reown_appkit_dapp/utils/string_constants.dart';
 import 'package:reown_appkit_dapp/widgets/event_widget.dart';
-import 'package:reown_appkit_dapp/widgets/log_overlay.dart';
 
 Future<void> main() async {
-  await runZonedGuarded<Future<void>>(
-    () async {
-      WidgetsFlutterBinding.ensureInitialized();
-      DeepLinkHandler.initListener();
-      runApp(MyApp());
-    },
-    (error, stackTrace) async {},
-  );
+  WidgetsFlutterBinding.ensureInitialized();
+  DeepLinkHandler.initListener();
+  runApp(MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -50,8 +44,6 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   ReownAppKit? _appKit;
   ReownAppKitModal? _appKitModal;
-
-  final LogManager _logManager = LogManager();
 
   @override
   void initState() {
@@ -92,8 +84,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _logListener(String event) => _logManager.addLog(event);
-
   Future<void> _initializeService() async {
     _appKit = ReownAppKit(
       core: ReownCore(projectId: DartDefines.projectId, logLevel: LogLevel.all),
@@ -114,8 +104,6 @@ class _MyHomePageState extends State<MyHomePage> {
       },
       disconnectOnDispose: true,
     );
-
-    _appKitModal!.appKit!.core.addLogListener(_logListener);
 
     _appKitModal!.onModalConnect.subscribe(_onModalConnect);
     _appKitModal!.onModalError.subscribe(_onModalError);
@@ -183,8 +171,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void dispose() {
-    _appKitModal!.appKit!.core.removeLogListener(_logListener);
-
     _appKit!.core.relayClient.onRelayClientError.unsubscribe(_relayClientError);
     _appKit!.core.relayClient.onRelayClientConnect.unsubscribe(_setState);
     _appKit!.core.relayClient.onRelayClientDisconnect.unsubscribe(_setState);
@@ -194,8 +180,6 @@ class _MyHomePageState extends State<MyHomePage> {
     _appKitModal!.onModalError.unsubscribe(_onModalError);
     _appKitModal!.onSessionEventEvent.unsubscribe(_onSessionEvent);
     _appKitModal!.onSessionUpdateEvent.unsubscribe(_onSessionUpdate);
-
-    _logManager.dispose();
     super.dispose();
   }
 
