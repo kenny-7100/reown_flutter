@@ -265,7 +265,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _initializeService() async {
     final prefs = await SharedPreferences.getInstance();
-    final linkModeEnabled = prefs.getBool('appkit_sample_linkmode') ?? true;
+    final linkModeEnabled = false;
     final analyticsEnabled = prefs.getBool('appkit_sample_analytics') ?? true;
     final socialsEnabled = prefs.getBool('appkit_sample_socials') ?? true;
 
