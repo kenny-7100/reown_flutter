@@ -61,59 +61,14 @@ class ConnectPageState extends State<ConnectPage> {
 
   @override
   Widget build(BuildContext context) {
-    final modalTheme = ReownAppKitModalTheme.maybeOf(context);
-    final isDarkMode = modalTheme?.isDarkMode ?? false;
-    final themeColors = ReownAppKitModalTheme.colorsOf(context);
     return RefreshIndicator(
       onRefresh: _refreshData,
-      child: Stack(
+      child: Column(
         children: [
-          Center(
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Container(
-                  color: isDarkMode
-                      ? Colors.black.withValues(alpha: 0.8)
-                      : Colors.white.withValues(alpha: 0.8),
-                ),
-              ],
-            ),
-          ),
-          ListView(
-            padding: const EdgeInsets.symmetric(
-              horizontal: StyleConstants.linear16,
-            ),
-            children: <Widget>[
-              const SizedBox(height: StyleConstants.linear16),
-              const SizedBox(height: StyleConstants.linear8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  AppKitModalNetworkSelectButton(
-                    appKit: widget.appKitModal,
-                    size: BaseButtonSize.small,
-                    closeAfterPick: true,
-                  ),
-                  const SizedBox.square(dimension: 8.0),
-                  AppKitModalConnectButton(
-                    appKit: widget.appKitModal,
-                    size: BaseButtonSize.small,
-                  ),
-                ],
-              ),
-              Divider(color: themeColors.grayGlass010),
-              const SizedBox(height: StyleConstants.linear8),
-              Visibility(
-                visible: widget.appKitModal.isConnected,
-                child: Column(
-                  children: [
-                    AppKitModalAccountButton(appKitModal: widget.appKitModal),
-                  ],
-                ),
-              ),
-              const SizedBox(height: StyleConstants.linear8),
-            ],
+          AppKitModalConnectButton(appKit: widget.appKitModal),
+          Visibility(
+            visible: widget.appKitModal.isConnected,
+            child: AppKitModalAccountButton(appKitModal: widget.appKitModal),
           ),
         ],
       ),
