@@ -11,26 +11,6 @@ class ConnectPage extends StatefulWidget {
 }
 
 class ConnectPageState extends State<ConnectPage> {
-  final List<ReownAppKitModalNetworkInfo> _selectedChains = [];
-
-  @override
-  void initState() {
-    super.initState();
-    widget.appKitModal.appKit!.onSessionConnect.subscribe(_onSessionConnect);
-    widget.appKitModal.appKit!.onSessionAuthResponse.subscribe(
-      _onSessionAuthResponse,
-    );
-  }
-
-  @override
-  void dispose() {
-    widget.appKitModal.appKit!.onSessionAuthResponse.unsubscribe(
-      _onSessionAuthResponse,
-    );
-    widget.appKitModal.appKit!.onSessionConnect.unsubscribe(_onSessionConnect);
-    super.dispose();
-  }
-
   Future<void> _refreshData() async {
     try {
       await widget.appKitModal.reconnectRelay();
@@ -60,16 +40,5 @@ class ConnectPageState extends State<ConnectPage> {
         ],
       ),
     );
-  }
-
-  void _onSessionConnect(SessionConnect? event) async {
-    if (event == null) return;
-    setState(() => _selectedChains.clear());
-  }
-
-  void _onSessionAuthResponse(SessionAuthResponse? response) {
-    if (response?.session != null) {
-      setState(() => _selectedChains.clear());
-    }
   }
 }
