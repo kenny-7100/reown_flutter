@@ -28,7 +28,6 @@ class ConnectPageState extends State<ConnectPage> {
     widget.appKitModal.onModalNetworkChange.subscribe(_onModalNetworkChange);
     widget.appKitModal.onModalDisconnect.subscribe(_onModalDisconnect);
     widget.appKitModal.onModalError.subscribe(_onModalError);
-    //
     widget.appKitModal.appKit!.onSessionConnect.subscribe(_onSessionConnect);
     widget.appKitModal.appKit!.onSessionAuthResponse.subscribe(
       _onSessionAuthResponse,
@@ -68,7 +67,6 @@ class ConnectPageState extends State<ConnectPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Build the list of chain buttons, clear if the textnet changed
     final modalTheme = ReownAppKitModalTheme.maybeOf(context);
     final isDarkMode = modalTheme?.isDarkMode ?? false;
     final themeColors = ReownAppKitModalTheme.colorsOf(context);
@@ -80,9 +78,6 @@ class ConnectPageState extends State<ConnectPage> {
             child: Stack(
               alignment: Alignment.center,
               children: [
-                // Center(
-                //   child: Image.asset('assets/appkit-logo.png', width: 200.0),
-                // ),
                 Container(
                   color: isDarkMode
                       ? Colors.black.withValues(alpha: 0.8)
@@ -233,44 +228,6 @@ class __RequestButtonsState extends State<_RequestButtons> {
       chainId,
     );
     final implemented = getChainMethods(namespace);
-    // return TextButton(
-    //   onPressed: () async {
-    //     // Chain is our BE chain data
-    //     final targetChain = ReownAppKitModalNetworkInfo(
-    //       name: 'Base',
-    //       chainId: 'eip155:8453',
-    //       currency: 'ETH',
-    //       rpcUrl: 'https://mainnet.base.org',
-    //       explorerUrl: 'https://basescan.org',
-    //     );
-
-    //     // await widget.appKitModal.requestSwitchToChain(targetChain);
-    //     await widget.appKitModal.selectChain(
-    //       targetChain,
-    //       switchChain: true,
-    //     );
-
-    //     final bytes = utf8.encode('testSignData');
-    //     final encoded = bytesToHex(bytes, include0x: true);
-    //     final transactionId = await widget.appKitModal.request(
-    //       topic: widget.appKitModal.session?.topic,
-    //       chainId: widget.appKitModal.selectedChain!.chainId,
-    //       request: SessionRequestParams(
-    //         method: 'personal_sign',
-    //         params: [
-    //           encoded,
-    //           widget.appKitModal.session!.getAddress('eip155'),
-    //         ],
-    //       ),
-    //     );
-    //     if (transactionId is! String) {
-    //       throw Exception(
-    //           'Failed to send transaction ${transactionId.toString()}');
-    //     }
-    //     print(transactionId);
-    //   },
-    //   child: Text('Test'),
-    // );
     return Wrap(
       alignment: WrapAlignment.center,
       spacing: 8.0,
@@ -283,17 +240,6 @@ class __RequestButtonsState extends State<_RequestButtons> {
               borderRadius: BorderRadius.all(Radius.circular(30.0)),
               buttonSize: BaseButtonSize.regular,
               onTap: () async {
-                // Uncomment to sign and submit real transaction
-                // if (method == 'polkadot_signTransaction') {
-                //   final future = Polkadot.createAndSubmitTransferKeepAlive(
-                //     widget.appKitModal,
-                //   );
-                //   await MethodDialog.show(
-                //     context,
-                //     method,
-                //     future,
-                //   );
-                // } else {
                 final params = await getParams(method, address, chainInfo!);
                 if (params?.params != null) {
                   final future = widget.appKitModal.request(
@@ -302,7 +248,6 @@ class __RequestButtonsState extends State<_RequestButtons> {
                     request: params!,
                   );
                   await MethodDialog.show(context, method, future);
-                  // debugPrint(result);
                 } else {
                   toastification.show(
                     type: ToastificationType.error,
@@ -312,7 +257,6 @@ class __RequestButtonsState extends State<_RequestButtons> {
                     alignment: Alignment.bottomCenter,
                   );
                 }
-                // }
               },
             ),
           )
