@@ -27,7 +27,6 @@ Future<void> main() async {
       if (kDebugMode) {
         runApp(MyApp());
       } else {
-        // Catch Flutter framework errors
         FlutterError.onError = (FlutterErrorDetails details) {
           FlutterError.presentError(details);
           Sentry.captureException(details.exception, stackTrace: details.stack);
@@ -37,14 +36,8 @@ Future<void> main() async {
           options.dsn = DartDefines.sentryDSN;
           options.environment = kDebugMode ? 'debug_app' : 'deployed_app';
           options.attachScreenshot = true;
-          // Adds request headers and IP for users,
-          // visit: https://docs.sentry.io/platforms/dart/data-management/data-collected/ for more info
           options.sendDefaultPii = true;
-          // Set tracesSampleRate to 1.0 to capture 100% of transactions for tracing.
-          // We recommend adjusting this value in production.
           options.tracesSampleRate = 1.0;
-          // The sampling rate for profiling is relative to tracesSampleRate
-          // Setting to 1.0 will profile 100% of sampled transactions:
           options.profilesSampleRate = 1.0;
         }, appRunner: () => runApp(SentryWidget(child: const MyApp())));
       }
@@ -112,11 +105,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                 accent090: const Color.fromARGB(255, 55, 186, 149),
                 accent080: const Color.fromARGB(255, 55, 186, 149),
                 grayGlass100: const Color.fromARGB(255, 55, 186, 149),
-                // Main Modal's background color
                 background125: const Color.fromARGB(255, 0, 0, 0),
-                // Main Modal's text
                 foreground100: const Color.fromARGB(255, 55, 186, 149),
-                // Secondary Modal's text
                 foreground125: const Color.fromARGB(255, 255, 255, 255),
                 foreground200: const Color.fromARGB(255, 255, 255, 255),
                 foreground300: const Color.fromARGB(255, 255, 255, 255),
@@ -126,11 +116,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                 accent090: const Color.fromARGB(255, 55, 186, 149),
                 accent080: const Color.fromARGB(255, 55, 186, 149),
                 grayGlass100: const Color.fromARGB(255, 55, 186, 149),
-                // Main Modal's background color
                 background125: const Color.fromARGB(255, 255, 255, 255),
-                // Main Modal's text
                 foreground100: const Color.fromARGB(255, 55, 186, 149),
-                // Secondary Modal's text
                 foreground125: const Color.fromARGB(255, 0, 0, 0),
                 foreground200: const Color.fromARGB(255, 0, 0, 0),
                 foreground300: const Color.fromARGB(255, 0, 0, 0),
@@ -208,8 +195,6 @@ class _MyHomePageState extends State<MyHomePage> {
     return Redirect(
       native: 'wcflutterdapp$_flavor://',
       universal: _universalLink(),
-      // enable linkMode on Wallet so Dapps can use relay-less connection
-      // universal: value must be set on cloud config as well
       linkMode: linkModeEnabled,
     );
   }
@@ -238,23 +223,20 @@ class _MyHomePageState extends State<MyHomePage> {
         AppKitSocialOption.Facebook,
         AppKitSocialOption.Twitch,
         AppKitSocialOption.Telegram,
-        // AppKitSocialOption.Farcaster,
       ],
-      showMainWallets: true, // OPTIONAL - true by default
+      showMainWallets: true,
     );
   }
 
-  // ignore: unused_element
   Set<String>? _specificsWalletIds() {
     return {
-      // '2c81da3add65899baeac53758a07e652eea46dbb5195b8074772c62a77bbf568', // Ambire Wallet
-      'a797aa35c0fadbfc1a53e7f675162ed5226968b44a19ee3d24385c64d1d3c393', // Phantom
-      'fd20dc426fb37566d803205b19bbc1d4096b248ac04548e3cfb6b3a38bd033aa', // Coinbase
-      '18450873727504ae9315a084fa7624b5297d2fe5880f0982979c17345a138277', // Kraken Wallet
-      'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96', // Metamask
-      '1ae92b26df02f0abca6304df07debccd18262fdf5fe82daa81593582dac9a369', // Rainbow
-      'c03dfee351b6fcc421b4494ea33b9d4b92a984f87aa76d1663bb28705e95034a', // Uniswap
-      '38f5d18bd8522c244bdd70cb4a68e0e718865155811c043f052fb9f1c51de662', // Bitget
+      'a797aa35c0fadbfc1a53e7f675162ed5226968b44a19ee3d24385c64d1d3c393',
+      'fd20dc426fb37566d803205b19bbc1d4096b248ac04548e3cfb6b3a38bd033aa',
+      '18450873727504ae9315a084fa7624b5297d2fe5880f0982979c17345a138277',
+      'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96',
+      '1ae92b26df02f0abca6304df07debccd18262fdf5fe82daa81593582dac9a369',
+      'c03dfee351b6fcc421b4494ea33b9d4b92a984f87aa76d1663bb28705e95034a',
+      '38f5d18bd8522c244bdd70cb4a68e0e718865155811c043f052fb9f1c51de662',
     };
   }
 
@@ -271,7 +253,6 @@ class _MyHomePageState extends State<MyHomePage> {
       metadata: _pairingMetadata(linkModeEnabled),
     );
 
-    // Register event handlers
     _appKit!.core.relayClient.onRelayClientError.subscribe(_relayClientError);
     _appKit!.core.relayClient.onRelayClientConnect.subscribe(_setState);
     _appKit!.core.relayClient.onRelayClientDisconnect.subscribe(_setState);
@@ -285,13 +266,7 @@ class _MyHomePageState extends State<MyHomePage> {
       siweConfig: _siweConfig(linkModeEnabled),
       featuresConfig: socialsEnabled ? _featuresConfig() : null,
       optionalNamespaces: _namespacesBasedOnChains(),
-      // featuredWalletIds: _specificsWalletIds(),
-      // excludedWalletIds: _specificsWalletIds(),
-      // includedWalletIds: _specificsWalletIds(),
-      // MORE WALLETS https://explorer.walletconnect.com/?type=wallet&chains=eip155%3A1
       getBalanceFallback: () async {
-        // This method will be triggered if getting the balance from our blockchain API fails
-        // You could place here your own getBalance method
         return 0.0;
       },
       disconnectOnDispose: true,
@@ -335,9 +310,7 @@ class _MyHomePageState extends State<MyHomePage> {
     DeepLinkHandler.checkInitialLink();
 
     final allChains = ReownAppKitModalNetworks.getAllSupportedNetworks();
-    // Loop through all the chain data
     for (final chain in allChains) {
-      // Loop through the events for that chain
       final namespace = NamespaceUtils.getNamespaceFromChain(chain.chainId);
       for (final event in getChainEvents(namespace)) {
         _appKit!.registerEventHandler(chainId: chain.chainId, event: event);
@@ -345,7 +318,6 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  // Updates namespaces based on supported networks list
   Map<String, RequiredNamespace>? _namespacesBasedOnChains() {
     Map<String, RequiredNamespace> namespaces = {};
 
@@ -374,10 +346,8 @@ class _MyHomePageState extends State<MyHomePage> {
       return;
     }
 
-    // Loop through all the chain data
     final allChains = ReownAppKitModalNetworks.getAllSupportedNetworks();
     for (final chain in allChains) {
-      // Loop through the events for that chain
       final namespace = NamespaceUtils.getNamespaceFromChain(chain.chainId);
       for (final event in getChainEvents(namespace)) {
         _appKit!.registerEventHandler(chainId: chain.chainId, event: event);
@@ -394,14 +364,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void dispose() {
-    // Unregister event handlers
     _appKitModal!.appKit!.core.removeLogListener(_logListener);
 
     _appKit!.core.relayClient.onRelayClientError.unsubscribe(_relayClientError);
     _appKit!.core.relayClient.onRelayClientConnect.unsubscribe(_setState);
     _appKit!.core.relayClient.onRelayClientDisconnect.unsubscribe(_setState);
     _appKit!.core.relayClient.onRelayClientMessage.unsubscribe(_onRelayMessage);
-    //
+
     _appKitModal!.onModalConnect.unsubscribe(_onModalConnect);
     _appKitModal!.onModalUpdate.unsubscribe(_onModalUpdate);
     _appKitModal!.onModalNetworkChange.unsubscribe(_onModalNetworkChange);
@@ -409,7 +378,7 @@ class _MyHomePageState extends State<MyHomePage> {
     _appKitModal!.onModalError.unsubscribe(_onModalError);
     _appKitModal!.onSessionEventEvent.unsubscribe(_onSessionEvent);
     _appKitModal!.onSessionUpdateEvent.unsubscribe(_onSessionUpdate);
-    //
+
     _logManager.dispose();
     super.dispose();
   }
@@ -517,11 +486,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   SIWEConfig _siweConfig(bool enabled) => SIWEConfig(
         getNonce: () async {
-          // this has to be called at the very moment of creating the pairing uri
           return SIWEUtils.generateNonce();
         },
         getMessageParams: () async {
-          // Provide everything that is needed to construct the SIWE message
           debugPrint('[SIWEConfig] getMessageParams()');
           final url = _appKitModal!.appKit!.metadata.url;
           final uri = Uri.parse(url);
@@ -533,13 +500,10 @@ class _MyHomePageState extends State<MyHomePage> {
           );
         },
         createMessage: (SIWECreateMessageArgs args) {
-          // Create SIWE message to be signed.
-          // You can use our provided formatMessage() method of implement your own
           debugPrint('[SIWEConfig] createMessage()');
           return SIWEUtils.formatMessage(args);
         },
         verifyMessage: (SIWEVerifyMessageArgs args) async {
-          // Implement your verifyMessage to authenticate the user after it.
           debugPrint('[SIWEConfig] verifyMessage()');
           final chainId = SIWEUtils.getChainIdFromMessage(args.message);
           final address = SIWEUtils.getAddressFromMessage(args.message);
@@ -555,30 +519,24 @@ class _MyHomePageState extends State<MyHomePage> {
           );
         },
         getSession: () async {
-          // Return proper session from your Web Service
           final chainId = _appKitModal!.selectedChain!.chainId;
           final namespace = NamespaceUtils.getNamespaceFromChain(chainId);
           final address = _appKitModal!.session!.getAddress(namespace)!;
           return SIWESession(address: address, chains: [chainId]);
         },
         onSignIn: (SIWESession session) {
-          // Called after SIWE message is signed and verified
           debugPrint('[SIWEConfig] onSignIn()');
         },
         signOut: () async {
-          // Called when user taps on disconnect button
           return true;
         },
         onSignOut: () {
-          // Called when disconnecting WalletConnect session was successfull
           debugPrint('[SIWEConfig] onSignOut()');
         },
         enabled: enabled,
         signOutOnDisconnect: true,
         signOutOnAccountChange: false,
         signOutOnNetworkChange: false,
-        // nonceRefetchIntervalMs: 300000,
-        // sessionRefetchIntervalMs: 300000,
       );
 
   void _onModalConnect(ModalConnect? event) async {
@@ -609,9 +567,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _onModalError(ModalError? event) {
     debugPrint('[ExampleApp] _onModalError ${event?.toString()}');
-    // When user connected to Coinbase Wallet but Coinbase Wallet does not have a session anymore
-    // (for instance if user disconnected the dapp directly within Coinbase Wallet)
-    // Then Coinbase Wallet won't emit any event
     if ((event?.message ?? '').contains('Coinbase Wallet Error')) {
       _appKitModal!.disconnect();
     }
