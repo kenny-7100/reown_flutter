@@ -95,7 +95,6 @@ class _MyHomePageState extends State<MyHomePage> {
     _appKitModal = ReownAppKitModal(
       context: context,
       appKit: _appKit,
-      optionalNamespaces: _namespacesBasedOnChains(),
       getBalanceFallback: () async {
         return 0.0;
       },
@@ -108,57 +107,9 @@ class _MyHomePageState extends State<MyHomePage> {
     _appKitModal!.onSessionUpdateEvent.subscribe(_onSessionUpdate);
 
     await _appKitModal!.init();
-    await _registerEventHandlers();
 
     DeepLinkHandler.init(_appKitModal!);
     DeepLinkHandler.checkInitialLink();
-
-    final allChains = ReownAppKitModalNetworks.getAllSupportedNetworks();
-    for (final chain in allChains) {
-      final namespace = NamespaceUtils.getNamespaceFromChain(chain.chainId);
-      final events = NetworkUtils.defaultNetworkEvents[namespace] ?? [];
-      for (final event in events) {
-        _appKit!.registerEventHandler(chainId: chain.chainId, event: event);
-      }
-    }
-  }
-
-  Map<String, RequiredNamespace>? _namespacesBasedOnChains() {
-    Map<String, RequiredNamespace> namespaces = {};
-
-    final supportedNS = ReownAppKitModalNetworks.getAllSupportedNamespaces();
-    for (var ns in supportedNS) {
-      final chains = ReownAppKitModalNetworks.getAllSupportedNetworks(
-        namespace: ns,
-      );
-      if (chains.isNotEmpty) {
-        namespaces[ns] = RequiredNamespace(
-          chains: chains.map((c) => c.chainId).toList(),
-          methods: NetworkUtils.defaultNetworkMethods[ns] ?? [],
-          events: NetworkUtils.defaultNetworkEvents[ns] ?? [],
-        );
-      }
-    }
-
-    return namespaces;
-  }
-
-  Future<void> _registerEventHandlers() async {
-    final onLine = _appKit!.core.connectivity.isOnline.value;
-    if (!onLine) {
-      await Future.delayed(const Duration(milliseconds: 500));
-      _registerEventHandlers();
-      return;
-    }
-
-    final allChains = ReownAppKitModalNetworks.getAllSupportedNetworks();
-    for (final chain in allChains) {
-      final namespace = NamespaceUtils.getNamespaceFromChain(chain.chainId);
-      final events = NetworkUtils.defaultNetworkEvents[namespace] ?? [];
-      for (final event in events) {
-        _appKit!.registerEventHandler(chainId: chain.chainId, event: event);
-      }
-    }
   }
 
   void _relayClientError(ErrorEvent? event) {
