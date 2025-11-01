@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:reown_appkit/reown_appkit.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:reown_appkit_dapp/pages/connect_page.dart';
 import 'package:reown_appkit_dapp/utils/crypto/helpers.dart';
 import 'package:reown_appkit_dapp/utils/dart_defines.dart';
@@ -18,32 +17,9 @@ Future<void> main() async {
     () async {
       WidgetsFlutterBinding.ensureInitialized();
       DeepLinkHandler.initListener();
-
-      if (kDebugMode) {
-        runApp(MyApp());
-      } else {
-        FlutterError.onError = (FlutterErrorDetails details) {
-          FlutterError.presentError(details);
-          Sentry.captureException(details.exception, stackTrace: details.stack);
-        };
-
-        await SentryFlutter.init((options) {
-          options.dsn = DartDefines.sentryDSN;
-          options.environment = kDebugMode ? 'debug_app' : 'deployed_app';
-          options.attachScreenshot = true;
-          options.sendDefaultPii = true;
-          options.tracesSampleRate = 1.0;
-          options.profilesSampleRate = 1.0;
-        }, appRunner: () => runApp(SentryWidget(child: const MyApp())));
-      }
+      runApp(MyApp());
     },
-    (error, stackTrace) async {
-      if (!kDebugMode) {
-        await Sentry.captureException(error, stackTrace: stackTrace);
-      }
-      debugPrint('Uncaught error: $error');
-      debugPrint('Stack trace: $stackTrace');
-    },
+    (error, stackTrace) async {},
   );
 }
 
@@ -58,7 +34,6 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      navigatorObservers: [SentryNavigatorObserver()],
       title: StringConstants.appTitle,
       home: MyHomePage(),
     );
