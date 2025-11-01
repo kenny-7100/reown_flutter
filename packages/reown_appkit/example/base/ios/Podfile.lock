@@ -32,11 +32,11 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/objective_c/ios"
 
 SPEC CHECKSUMS:
-  coinbase_wallet_sdk: c893738400ef78bd20e7f4195cbb38266f7d15e8
+  coinbase_wallet_sdk: 7ccd4e1a7940deba6ba9bd81beece999a2268c15
   CoinbaseWalletSDK: ea1f37512bbc69ebe07416e3b29bf840f5cc3152
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
-  flutter_secure_storage: 1ed9476fba7e7a782b22888f956cce43e2c62f13
-  objective_c: 89e720c30d716b036faf9c9684022048eee1eee2
+  flutter_secure_storage: d33dac7ae2ea08509be337e775f6b59f1ff45f12
+  objective_c: 77e887b5ba1827970907e10e832eec1683f3431d
 
 PODFILE CHECKSUM: 0772a2bd8cd4c7aaeb2576ddfaf6b03be722593b
 

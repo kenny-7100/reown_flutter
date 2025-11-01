@@ -27,10 +27,10 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_secure_storage/ios"
 
 SPEC CHECKSUMS:
-  coinbase_wallet_sdk: c893738400ef78bd20e7f4195cbb38266f7d15e8
+  coinbase_wallet_sdk: 7ccd4e1a7940deba6ba9bd81beece999a2268c15
   CoinbaseWalletSDK: ea1f37512bbc69ebe07416e3b29bf840f5cc3152
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
-  flutter_secure_storage: 1ed9476fba7e7a782b22888f956cce43e2c62f13
+  flutter_secure_storage: d33dac7ae2ea08509be337e775f6b59f1ff45f12
 
 PODFILE CHECKSUM: 0a7d5b7d0e53420cb0284f7b2f171f93843b94d2
 
