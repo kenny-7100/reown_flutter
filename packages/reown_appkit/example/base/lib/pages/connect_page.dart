@@ -17,26 +17,14 @@ class ConnectPageState extends State<ConnectPage> {
   @override
   void initState() {
     super.initState();
-    widget.appKitModal.onModalConnect.subscribe(_onModalConnect);
-    widget.appKitModal.onModalUpdate.subscribe(_onModalUpdate);
-    widget.appKitModal.onModalNetworkChange.subscribe(_onModalNetworkChange);
-    widget.appKitModal.onModalDisconnect.subscribe(_onModalDisconnect);
-    widget.appKitModal.onModalError.subscribe(_onModalError);
     widget.appKitModal.appKit!.onSessionConnect.subscribe(_onSessionConnect);
     widget.appKitModal.appKit!.onSessionAuthResponse.subscribe(
       _onSessionAuthResponse,
     );
-    widget.appKitModal.onModalDisconnect.subscribe(_onModalDisconnect);
   }
 
   @override
   void dispose() {
-    widget.appKitModal.onModalConnect.unsubscribe(_onModalConnect);
-    widget.appKitModal.onModalUpdate.unsubscribe(_onModalUpdate);
-    widget.appKitModal.onModalNetworkChange.unsubscribe(_onModalNetworkChange);
-    widget.appKitModal.onModalDisconnect.unsubscribe(_onModalDisconnect);
-    widget.appKitModal.onModalError.unsubscribe(_onModalError);
-    widget.appKitModal.onModalDisconnect.unsubscribe(_onModalDisconnect);
     widget.appKitModal.appKit!.onSessionAuthResponse.unsubscribe(
       _onSessionAuthResponse,
     );
@@ -84,25 +72,5 @@ class ConnectPageState extends State<ConnectPage> {
     if (response?.session != null) {
       setState(() => _selectedChains.clear());
     }
-  }
-
-  void _onModalConnect(ModalConnect? event) async {
-    setState(() {});
-  }
-
-  void _onModalUpdate(ModalConnect? event) {
-    setState(() {});
-  }
-
-  void _onModalNetworkChange(ModalNetworkChange? event) {
-    setState(() {});
-  }
-
-  void _onModalDisconnect(ModalDisconnect? event) async {
-    setState(() {});
-  }
-
-  void _onModalError(ModalError? event) {
-    setState(() {});
   }
 }
