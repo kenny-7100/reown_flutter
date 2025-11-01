@@ -1,10 +1,6 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-
 import 'package:reown_appkit/reown_appkit.dart';
 import 'package:reown_appkit_dapp/utils/constants.dart';
-import 'package:reown_appkit_dapp/utils/crypto/helpers.dart';
 
 class ConnectPage extends StatefulWidget {
   const ConnectPage({super.key, required this.appKitModal});
@@ -113,33 +109,6 @@ class ConnectPageState extends State<ConnectPage> {
                 child: Column(
                   children: [
                     AppKitModalAccountButton(appKitModal: widget.appKitModal),
-                    const SizedBox.square(dimension: 8.0),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        AppKitModalBalanceButton(
-                          appKitModal: widget.appKitModal,
-                          onTap: widget.appKitModal.openModalView,
-                        ),
-                        const SizedBox.square(dimension: 8.0),
-                        AppKitModalAddressButton(
-                          appKitModal: widget.appKitModal,
-                          onTap: widget.appKitModal.openModalView,
-                        ),
-                      ],
-                    ),
-                    const SizedBox.square(dimension: 8.0),
-                    Text(
-                      'Connected with ${widget.appKitModal.session?.connectedWalletName ?? 'Unknown wallet'}',
-                    ),
-                    const SizedBox.square(dimension: 8.0),
-                    _SmartAccountButtons(appKitModal: widget.appKitModal),
-                    const SizedBox.square(dimension: 8.0),
-                    Text(
-                      const JsonEncoder.withIndent(
-                        '    ',
-                      ).convert(widget.appKitModal.session?.toJson()),
-                    ),
                   ],
                 ),
               ),
@@ -180,34 +149,5 @@ class ConnectPageState extends State<ConnectPage> {
 
   void _onModalError(ModalError? event) {
     setState(() {});
-  }
-}
-
-class _SmartAccountButtons extends StatefulWidget {
-  final ReownAppKitModal appKitModal;
-  const _SmartAccountButtons({required this.appKitModal});
-
-  @override
-  State<_SmartAccountButtons> createState() => __SmartAccountButtonsState();
-}
-
-class __SmartAccountButtonsState extends State<_SmartAccountButtons> {
-  @override
-  Widget build(BuildContext context) {
-    final chainId = widget.appKitModal.selectedChain?.chainId ?? '';
-    if (chainId.isEmpty) {
-      return SizedBox.shrink();
-    }
-    final namespace = NamespaceUtils.getNamespaceFromChain(chainId);
-    if (namespace != 'eip155') {
-      return SizedBox.shrink();
-    }
-
-    return FutureBuilder<Widget>(
-      future: contractCallsButton(widget.appKitModal, context),
-      builder: (context, snapshot) {
-        return snapshot.data ?? SizedBox.shrink();
-      },
-    );
   }
 }
