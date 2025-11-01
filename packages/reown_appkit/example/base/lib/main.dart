@@ -228,18 +228,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Set<String>? _specificsWalletIds() {
-    return {
-      'a797aa35c0fadbfc1a53e7f675162ed5226968b44a19ee3d24385c64d1d3c393',
-      'fd20dc426fb37566d803205b19bbc1d4096b248ac04548e3cfb6b3a38bd033aa',
-      '18450873727504ae9315a084fa7624b5297d2fe5880f0982979c17345a138277',
-      'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96',
-      '1ae92b26df02f0abca6304df07debccd18262fdf5fe82daa81593582dac9a369',
-      'c03dfee351b6fcc421b4494ea33b9d4b92a984f87aa76d1663bb28705e95034a',
-      '38f5d18bd8522c244bdd70cb4a68e0e718865155811c043f052fb9f1c51de662',
-    };
-  }
-
   void _logListener(String event) => _logManager.addLog(event);
 
   Future<void> _initializeService() async {
